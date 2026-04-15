@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { MapPin, Clock, Star, Users, Zap, ArrowRight, Heart } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { getImageUrl } from '@/lib/utils/imageUrl';
 
 interface StadiumCardProps {
   id: string;
@@ -40,7 +41,7 @@ const StadiumCard = ({
     if (imageError || !image) {
       return '/images/grid-image/image-01.png'; // fallback image
     }
-    return image?.startsWith('http') ? image : `http://localhost:8080/${image}`;
+    return getImageUrl(image);
   };
 
   return (

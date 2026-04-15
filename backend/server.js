@@ -1,10 +1,14 @@
 const app = require("./app");
 const http = require("http");
+const dns = require("dns");
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 
 // Load environment variables
 dotenv.config();
+
+// Force public DNS resolvers so MongoDB SRV lookups work behind restrictive local DNS
+dns.setServers(["8.8.8.8", "1.1.1.1"]);
 
 const DB = process.env.DATABASE.replace("<DATABASE_PASSWORD>", process.env.DATABASE_PASSWORD);
 

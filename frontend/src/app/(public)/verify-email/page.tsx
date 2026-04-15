@@ -17,7 +17,8 @@ export default function VerifyEmailPage() {
       if (!token) return;
 
       try {
-        const res = await axios.get(`http://localhost:8080/api/users/verify-email?token=${token}`);
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api";
+        const res = await axios.get(`${apiUrl}/users/verify-email?token=${token}`);
 
         toast.success(res.data.message || "Email verified successfully");
 

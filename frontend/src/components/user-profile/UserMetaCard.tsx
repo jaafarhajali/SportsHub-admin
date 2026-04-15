@@ -10,6 +10,7 @@ import Image from "next/image";
 import { useUser } from "../../context/UserContext";
 import { toast } from "react-toastify";
 import { updateUser } from "@/lib/api/users";
+import { getImageUrl } from "@/lib/utils/imageUrl";
 
 
 export default function UserMetaCard() {
@@ -139,11 +140,7 @@ export default function UserMetaCard() {
                   height={40}
                   className="object-cover w-full h-full"
                   loading="lazy"
-                  src={
-                    user.profilePhoto.startsWith('http')
-                      ? user.profilePhoto
-                      : `http://localhost:8080${user.profilePhoto}`
-                  }
+                  src={getImageUrl(user.profilePhoto)}
                   alt={user.username}
                 />
               ) : (

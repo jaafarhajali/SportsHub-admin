@@ -17,6 +17,7 @@ import { Academy } from "@/types/Academy";
 import { getAllAcademies, getAcademyByOwner, deleteAcademy } from "@/lib/api/dashboard/academy";
 import EditAcademyModal from "../ui/modal/academies/EditAcademyModal";
 import Loading from "../ui/loading";
+import { getImageUrl } from "@/lib/utils/imageUrl";
 
 interface AcademiesTableProps {
   tableData: Academy[];
@@ -153,7 +154,7 @@ export default function AcademiesTable({
                           width={40}
                           height={40}
                           className="object-cover w-full h-full"
-                          src={`http://localhost:8080${academy.photos[0]}`}
+                          src={getImageUrl(academy.photos[0])}
                           alt={academy.name}
                         />
                       ) : (

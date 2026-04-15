@@ -63,7 +63,8 @@ const AddUserModal: React.FC<AddUserModalProps> = ({ isOpen, onClose, setTableDa
     const fetchRoles = async () => {
         setLoadingRoles(true);
         try {
-            const response = await fetch('http://localhost:8080/api/roles');
+            const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api';
+            const response = await fetch(`${apiUrl}/roles`);
             if (response.ok) {
                 const rolesData = await response.json();
                 setRoles(rolesData);

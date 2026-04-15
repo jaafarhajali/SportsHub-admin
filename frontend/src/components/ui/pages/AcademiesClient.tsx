@@ -22,6 +22,7 @@ import {
   List
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { getImageUrl } from '@/lib/utils/imageUrl';
 
 // Enhanced Loading Component
 const LoadingSpinner = () => (
@@ -446,7 +447,7 @@ export default function AcademiesClient() {
                       <Image
                         src={
                           academy.photos && academy.photos.length > 0
-                            ? `http://localhost:8080${academy.photos[0]}`
+                            ? getImageUrl(academy.photos[0])
                             : DEFAULT_ACADEMY_IMAGE
                         }
                         alt={academy.name || 'Football Academy'}

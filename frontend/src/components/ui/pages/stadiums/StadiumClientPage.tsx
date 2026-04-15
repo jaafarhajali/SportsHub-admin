@@ -6,6 +6,7 @@ import { ChevronLeft, ChevronRight, MapPin, Clock, Banknote, Calendar, User, Use
 import { bookStadium, getStadiumById } from '@/lib/api/stadium';
 import { Stadium } from '@/types/Stadium';
 import { toast } from 'react-toastify';
+import { getImageUrl } from '@/lib/utils/imageUrl';
 
 interface CalendarData {
     date: string;
@@ -279,9 +280,7 @@ export default function StadiumClientPage() {
         );
     }
 
-    const imageUrl = stadium.photos?.[0]?.startsWith('http')
-        ? stadium.photos[0]
-        : `http://localhost:8080${stadium.photos?.[0]}`;
+    const imageUrl = getImageUrl(stadium.photos?.[0]);
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 dark:from-stone-900 dark:via-stone-800 dark:to-stone-900">

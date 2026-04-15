@@ -7,6 +7,7 @@ import { DropdownItem } from "../ui/dropdown/DropdownItem";
 import { logout } from "@/lib/api/auth"
 import { useRouter } from "next/navigation";
 import { useUser } from "@/context/UserContext";
+import { getImageUrl } from "@/lib/utils/imageUrl";
 
 export default function UserDropdown() {
   const { user, refreshUser } = useUser();
@@ -62,11 +63,7 @@ export default function UserDropdown() {
               height={40}
               className="object-cover w-full h-full"
               loading="lazy"
-              src={
-                user.profilePhoto.startsWith('http')
-                  ? user.profilePhoto
-                  : `http://localhost:8080${user.profilePhoto}`
-              }
+              src={getImageUrl(user.profilePhoto)}
               alt={user.username}
             />
           ) : (

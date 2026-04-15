@@ -17,6 +17,7 @@ import { Badge } from "lebify-ui"
 import { User } from "@/types/User";
 import { toast } from "react-toastify";
 import EditUserModal from "../ui/modal/users/EditUserModal";
+import { getImageUrl } from "@/lib/utils/imageUrl";
 import { Role } from "@/types/Role";
 import Loading from "../ui/loading";
 
@@ -201,11 +202,7 @@ export default function UsersTable({
                             height={40}
                             className="object-cover w-full h-full"
                             loading="lazy"
-                            src={
-                              user.profilePhoto.startsWith('http')
-                                ? user.profilePhoto
-                                : `http://localhost:8080${user.profilePhoto}`
-                            }
+                            src={getImageUrl(user.profilePhoto)}
                             alt={user.username}
                           />
                         ) : (

@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { headers } from 'next/headers';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api';
 
 // Get token from localStorage (only safe to use on the client side)
 const getToken = (): string | null => {
