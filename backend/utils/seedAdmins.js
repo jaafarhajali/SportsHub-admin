@@ -6,7 +6,7 @@ const mongoose = require("mongoose");
 const Role = require("../models/roleModel");
 const User = require("../models/userModel");
 
-const ROLES = ["admin", "user", "stadiumOwner", "academyOwner"];
+const ROLES = ["admin", "user", "stadiumOwner", "academyOwner", "teamLeader", "referee"];
 
 const ADMINS = [
   {

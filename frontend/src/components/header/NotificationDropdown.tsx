@@ -37,8 +37,8 @@ export default function NotificationDropdown() {
 
     getAllNotifications()
       .then(setNotifications)
-      .catch(() => {
-        console.error("Failed to load notifications");
+      .catch((err) => {
+        console.error("Failed to load notifications:", err?.response?.status, err?.response?.data ?? err?.message);
       });
   }, [isOpen, user]);
 

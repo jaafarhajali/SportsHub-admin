@@ -51,6 +51,34 @@ const SAMPLE_USERS = [
     phoneNumber: "+96173333332",
     roleName: "academyOwner",
   },
+  {
+    username: "ali leader",
+    email: "ali.leader@sportshub.com",
+    password: "Leader@1234",
+    phoneNumber: "+96174444441",
+    roleName: "teamLeader",
+  },
+  {
+    username: "rana leader",
+    email: "rana.leader@sportshub.com",
+    password: "Leader@1234",
+    phoneNumber: "+96174444442",
+    roleName: "teamLeader",
+  },
+  {
+    username: "youssef referee",
+    email: "youssef.referee@sportshub.com",
+    password: "Referee@1234",
+    phoneNumber: "+96175555551",
+    roleName: "referee",
+  },
+  {
+    username: "hadi referee",
+    email: "hadi.referee@sportshub.com",
+    password: "Referee@1234",
+    phoneNumber: "+96175555552",
+    roleName: "referee",
+  },
 ];
 
 const stadiumsFor = (ownerId, ownerLabel) => [

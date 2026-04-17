@@ -20,20 +20,12 @@ axiosInstance.interceptors.request.use((config) => {
 });
 
 export const getAllNotifications = async () => {
-  try {
-    const response = await axiosInstance.get("/notifications");
-    return response.data.notifications;
-  } catch (error) {
-    throw new Error("Failed to fetch notifications");
-  }
+  const response = await axiosInstance.get("/notifications");
+  return response.data.notifications ?? [];
 };
 
 export const clearAllNotifications = async () => {
-  try {
-    const response = await axiosInstance.delete("/notifications/clear-all");
-    return response.data;
-  } catch (error) {
-    throw new Error("Failed to clear notifications");
-  }
+  const response = await axiosInstance.delete("/notifications/clear-all");
+  return response.data;
 };
 

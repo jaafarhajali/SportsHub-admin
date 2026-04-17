@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
@@ -19,11 +19,11 @@
     "@react-jvectormap/world": "^1.1.2",
     "@tailwindcss/forms": "^0.5.9",
     "@tailwindcss/postcss": "^4.0.9",
-    "axios": "^1.9.0",
+    "axios": "^1.7.7",
     "jwt-decode": "^4.0.0",
     "lebify-ui": "^0.1.61",
     "lucide-react": "^0.511.0",
-    "next": "15.3.2",
+    "next": "^15.8.0",
     "react": "^19.0.0",
     "react-apexcharts": "^1.7.0",
     "react-dom": "^19.0.0",
