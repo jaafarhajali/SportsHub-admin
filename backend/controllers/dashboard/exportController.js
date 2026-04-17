@@ -1,4 +1,5 @@
 // controllers/exportController.js
+const logger = require("../../utils/logger");
 const ExcelJS = require("exceljs");
 const User = require("../../models/userModel");
 const Stadium = require("../../models/stadiumModel");
@@ -109,7 +110,7 @@ exports.exportTableToExcel = async (req, res) => {
     await workbook.xlsx.write(res);
     res.end();
   } catch (error) {
-    console.error(error);
+    logger.error("Export error", { error: error.message });
     res.status(500).json({ success: false, message: "Export failed" });
   }
 };

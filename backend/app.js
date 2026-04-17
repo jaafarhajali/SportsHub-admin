@@ -16,6 +16,11 @@ const bookingRoute = require("./routes/bookingRoute");
 const userRoute = require("./routes/userRoute");
 const teamRoute = require("./routes/teamRoute");
 const notificationRoute = require("./routes/notificationRoute");
+const aiRoute = require("./routes/aiRoute");
+const reviewRoute = require("./routes/reviewRoute");
+const { aiLimiter, authLimiter } = require("./middlewares/rateLimiters");
+const swaggerUi = require("swagger-ui-express");
+const openapiSpec = require("./docs/openapi");
 
 const app = express();
 
@@ -42,9 +47,25 @@ app.use(morgan("dev"));
 
 app.use(express.static(path.join(__dirname, "public")));
 
+// API documentation (Swagger UI).
+app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(openapiSpec, { explorer: true }));
+app.get("/api/docs.json", (req, res) => res.json(openapiSpec));
+
+// Health check — for uptime monitors and deploy probes.
+app.get("/api/health", (req, res) => {
+  const mongoose = require("mongoose");
+  const dbStates = ["disconnected", "connected", "connecting", "disconnecting"];
+  res.json({
+    status: "ok",
+    db: dbStates[mongoose.connection.readyState] || "unknown",
+    uptime: Math.round(process.uptime()),
+    timestamp: new Date().toISOString(),
+  });
+});
+
 // Mount all routes
 app.use("/api/dashboard", dashboardRoute);
-app.use("/api/auth", authRoute);
+app.use("/api/auth", authLimiter, authRoute);
 app.use("/api/roles", roleRoute);
 app.use("/api/upload", uploadRoute);
 
@@ -55,6 +76,8 @@ app.use("/api/bookings", bookingRoute);
 app.use("/api/users", userRoute);
 app.use("/api/teams", teamRoute);
 app.use("/api/notifications", notificationRoute);
+app.use("/api/ai", aiLimiter, aiRoute);
+app.use("/api/reviews", reviewRoute);
 
 
 module.exports = app;

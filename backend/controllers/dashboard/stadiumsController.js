@@ -1,4 +1,5 @@
 const Stadium = require("../../models/stadiumModel");
+const logger = require("../../utils/logger");
 const User = require("../../models/userModel");
 const mongoose = require("mongoose");
 const Notification = require("../../models/notificationModel");
@@ -6,6 +7,7 @@ const Booking = require("../../models/bookingModel");
 const Tournament = require("../../models/tournamentModel");
 
 const generateSlots = require("../../utils/generateSlots"); // Adjust path if needed
+const { getPagination, buildPagination } = require("../../utils/paginate");
 
 const fillCalendarWithSlots = async (stadium, startDate = new Date(), endDate = null, oldBookedMap = new Map()) => {
   if (!endDate) {
@@ -51,17 +53,24 @@ const fillCalendarWithSlots = async (stadium, startDate = new Date(), endDate = 
   }
 };
 
-// Get all stadiums
+// Get all stadiums (paginated)
 const getAllStadiums = async (req, res) => {
   try {
-    const stadiums = await Stadium.find()
-      .populate("ownerId", "username email") // Populate owner info, adjust fields as needed
-      .sort({ createdAt: -1 });
+    const { page, limit, skip } = getPagination(req, { defaultLimit: 20, maxLimit: 100 });
+    const [stadiums, total] = await Promise.all([
+      Stadium.find()
+        .populate("ownerId", "username email")
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit),
+      Stadium.countDocuments(),
+    ]);
 
     res.status(200).json({
       success: true,
       count: stadiums.length,
       data: stadiums,
+      pagination: buildPagination(page, limit, total),
     });
   } catch (error) {
     res.status(500).json({
@@ -154,23 +163,18 @@ const addStadium = async (req, res) => {
     if (userRole === "admin") {
       if (ownerId) {
         const targetUser = await User.findById(ownerId);
-        console.log(targetUser);
         if (!targetUser || (targetUser.role.name !== "stadiumOwner" && targetUser.role.name !== "admin")) {
           return res.status(400).json({ success: false, message: "Invalid stadium owner" });
         }
         finalOwnerId = ownerId;
-        console.log(finalOwnerId);
       } else {
         finalOwnerId = userId;
-        console.log(finalOwnerId);
       }
     } else if (userRole === "stadiumOwner") {
       if (ownerId && ownerId !== userId.toString()) {
         return res.status(403).json({ success: false, message: "You cannot assign stadium to another user" });
       }
       finalOwnerId = userId;
-      console.log("stadium owner account");
-      console.log(finalOwnerId);
     } else {
       return res.status(403).json({ success: false, message: "Unauthorized role" });
     }
@@ -239,7 +243,7 @@ const addStadium = async (req, res) => {
       data: savedStadium,
     });
   } catch (error) {
-    console.error("Error in addStadium:", error);
+    logger.error("Error in addStadium:", { error: error.message });
     if (error.name === "ValidationError") {
       const messages = Object.values(error.errors).map((val) => val.message);
       return res.status(400).json({ success: false, message: "Validation error", errors: messages });
@@ -339,7 +343,7 @@ const updateStadium = async (req, res) => {
       return res.status(400).json({ success: false, message: "Validation error", errors });
     }
 
-    console.error("Error updating stadium:", error);
+    logger.error("Error updating stadium:", { error: error.message });
     res.status(500).json({ success: false, message: "Error updating stadium", error: error.message });
   }
 };

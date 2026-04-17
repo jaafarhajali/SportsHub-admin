@@ -9,6 +9,7 @@ import { toast } from "react-toastify";
 import { PenaltyPolicy, Stadium, WorkingHours } from "@/types/Stadium";
 import { addStadium } from "@/lib/api/dashboard/stadiums";
 import { useUser } from "@/context/UserContext";
+import AiDescriptionButton from "@/components/ai/AiDescriptionButton";
 
 interface AddStadiumModalProps {
     isOpen: boolean;
@@ -20,6 +21,7 @@ const AddStadiumModal: React.FC<AddStadiumModalProps> = ({ isOpen, onClose, setT
     const [formData, setFormData] = useState({
         name: "",
         location: "",
+        description: "",
         photos: [] as File[],
         pricePerMatch: "",
         maxPlayers: "",
@@ -251,6 +253,34 @@ const AddStadiumModal: React.FC<AddStadiumModalProps> = ({ isOpen, onClose, setT
                             className={errors.maxPlayers ? "border-l-3 border-l-red-500" : "border-l-3 border-l-green-700"}
                         />
                         {errors.maxPlayers && <FieldError message={errors.maxPlayers} />}
+                    </div>
+
+                    {/* Description */}
+                    <div>
+                        <div className="flex items-center justify-between mb-1">
+                            <Label>Description</Label>
+                            <AiDescriptionButton
+                                type="stadium"
+                                fields={{
+                                    name: formData.name,
+                                    location: formData.location,
+                                    pricePerMatch: formData.pricePerMatch,
+                                    maxPlayers: formData.maxPlayers,
+                                    workingHours: formData.workingHours,
+                                }}
+                                onGenerated={(desc) =>
+                                    setFormData((p) => ({ ...p, description: desc }))
+                                }
+                            />
+                        </div>
+                        <textarea
+                            name="description"
+                            placeholder="Enter description (or click Generate with AI)"
+                            value={formData.description}
+                            onChange={(e) => setFormData((p) => ({ ...p, description: e.target.value }))}
+                            rows={4}
+                            className="w-full rounded-lg border border-gray-300 outline-none appearance-none px-4 py-2.5 text-sm placeholder:text-gray-400 dark:bg-stone-950 dark:text-white/90 dark:placeholder:text-white/30 dark:border-gray-700 border-l-3 border-l-green-700"
+                        />
                     </div>
 
                     {/* Penalty Policy */}

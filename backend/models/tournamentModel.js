@@ -69,6 +69,9 @@ const tournamentSchema = new mongoose.Schema({
   },
 });
 
+tournamentSchema.index({ stadiumId: 1, startDate: 1 });
+tournamentSchema.index({ owner: 1 });
+
 const Tournament = mongoose.model("Tournament", tournamentSchema);
 
 module.exports = Tournament;

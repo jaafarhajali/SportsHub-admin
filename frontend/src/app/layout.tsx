@@ -3,6 +3,7 @@ import './globals.css';
 import { SidebarProvider } from '@/context/SidebarContext';
 import { ThemeProvider } from '@/context/ThemeContext';
 import { UserProvider } from '@/context/UserContext';
+import ChatbotWidget from '@/components/ai/ChatbotWidget';
 
 export default function RootLayout({
   children,
@@ -16,6 +17,7 @@ export default function RootLayout({
           <UserProvider>
             <SidebarProvider>
               {children}
+              <ChatbotWidget />
             </SidebarProvider>
           </UserProvider>
         </ThemeProvider>

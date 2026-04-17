@@ -1,4 +1,5 @@
 const User = require("../../models/userModel");
+const logger = require("../../utils/logger");
 const Role = require("../../models/roleModel");
 const Booking = require("../../models/bookingModel");
 const Stadium = require("../../models/stadiumModel");
@@ -7,26 +8,29 @@ const Academy = require("../../models/academyModel");
 const Team = require("../../models/teamModel");
 const Notification = require("../../models/notificationModel");
 const asyncHandler = require("express-async-handler");
+const { getPagination, buildPagination } = require("../../utils/paginate");
 
 // @desc    Get all users
 // @route   GET /dashboard/users
 // @access  Admin
 exports.getAllUsers = asyncHandler(async (req, res) => {
-  const users = await User.find().populate("createdBy", "username").populate("updatedBy", "username").lean();
-
-  const transformedUsers = users.map((user) => ({
-    ...user,
-    createdAt: user.createdAt,
-    updatedAt: user.updatedAt,
-    role: user.role,
-  }));
+  const { page, limit, skip } = getPagination(req, { defaultLimit: 20, maxLimit: 100 });
+  const [users, total] = await Promise.all([
+    User.find()
+      .populate("createdBy", "username")
+      .populate("updatedBy", "username")
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .lean(),
+    User.countDocuments(),
+  ]);
 
   res.status(200).json({
     status: "success",
-    results: transformedUsers.length,
-    data: {
-      users: transformedUsers,
-    },
+    results: users.length,
+    data: { users },
+    pagination: buildPagination(page, limit, total),
   });
 });
 
@@ -65,10 +69,6 @@ exports.addUser = asyncHandler(async (req, res) => {
     isActive = true,
     termsAccepted = true,
   } = req.body;
-
-  // Debug: Check if req.user exists
-  // console.log("req.user:", req.user);
-  // console.log("req.user._id:", req.user?.id);
 
   // Validation
   if (!username || !email || !password || !passwordConfirm || !roleId) {
@@ -136,12 +136,8 @@ exports.addUser = asyncHandler(async (req, res) => {
     userData.updatedBy = req.user.id;
   }
 
-  console.log("userData before create:", userData);
-
   // Create user
   const newUser = await User.create(userData);
-
-  console.log("newUser after create:", newUser);
 
   // Populate the created user only if createdBy/updatedBy exist
   let populatedUser;
@@ -339,7 +335,7 @@ exports.getAcademyOwners = async (req, res) => {
     const owners = await User.find({ "role.name": "academyOwner" }, "id username email");
     res.json({ success: true, data: owners });
   } catch (error) {
-    console.error("Error fetching academy owners:", error);
+    logger.error("Error fetching academy owners:", { error: error.message });
     res.status(500).json({ success: false, message: "Server error" });
   }
 };
@@ -347,10 +343,9 @@ exports.getAcademyOwners = async (req, res) => {
 exports.getStadiumOwners = async (req, res) => {
   try {
     const owners = await User.find({ "role.name": "stadiumOwner" }, "id username email");
-    console.log(owners);  
     res.json({ success: true, data: owners });
   } catch (error) {
-    console.error("Error fetching stadium owners:", error);
+    logger.error("Error fetching stadium owners:", { error: error.message });
     res.status(500).json({ success: false, message: "Server error" });
   }
 };

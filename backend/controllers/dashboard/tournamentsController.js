@@ -4,17 +4,27 @@ const Team = require("../../models/teamModel");
 const User = require("../../models/userModel");
 const Stadium = require("../../models/stadiumModel");
 const Notification = require("../../models/notificationModel");
+const { getPagination, buildPagination } = require("../../utils/paginate");
 
-// Get all tournaments
+// Get all tournaments (paginated)
 exports.getAllTournaments = asyncHandler(async (req, res) => {
-  const tournaments = await Tournament.find()
-    .populate("createdBy", "username")
-    .populate("stadiumId", "name")
-    .populate("teams", "name");
+  const { page, limit, skip } = getPagination(req, { defaultLimit: 20, maxLimit: 100 });
+  const [tournaments, total] = await Promise.all([
+    Tournament.find()
+      .populate("createdBy", "username")
+      .populate("stadiumId", "name")
+      .populate("teams", "name")
+      .sort({ startDate: -1 })
+      .skip(skip)
+      .limit(limit),
+    Tournament.countDocuments(),
+  ]);
 
   res.status(200).json({
     status: "success",
+    count: tournaments.length,
     data: tournaments,
+    pagination: buildPagination(page, limit, total),
   });
 });
 

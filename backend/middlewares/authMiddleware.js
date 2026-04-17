@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/userModel'); // Adjust path as needed
+const logger = require('../utils/logger');
 
 // Configuration
 const JWT_SECRET = process.env.JWT_SECRET;
@@ -101,7 +102,7 @@ const authenticate = (options = {}) => {
           message = ERROR_MESSAGES.INVALID_TOKEN;
           code = 'INVALID_TOKEN';
         } else if (error.message === ERROR_MESSAGES.INVALID_JWT_SECRET) {
-          console.error('JWT_SECRET not configured properly');
+          logger.error('JWT_SECRET not configured properly');
           message = 'Internal server error';
           code = 'SERVER_ERROR';
         }
@@ -137,7 +138,7 @@ const authenticate = (options = {}) => {
 
           req.user = user;
         } catch (dbError) {
-          console.error('Database error in authentication:', dbError);
+          logger.error('Database error in authentication', { error: dbError.message });
           return res.status(500).json({
             success: false,
             message: 'Internal server error',
@@ -151,7 +152,7 @@ const authenticate = (options = {}) => {
 
       next();
     } catch (error) {
-      console.error('Authentication middleware error:', error);
+      logger.error('Authentication middleware error', { error: error.message });
       return res.status(500).json({
         success: false,
         message: 'Authentication service error',
@@ -207,7 +208,7 @@ const authorize = (allowedRoles, options = {}) => {
       });
 
     } catch (error) {
-      console.error('Authorization middleware error:', error);
+      logger.error('Authorization middleware error', { error: error.message });
       return res.status(500).json({
         success: false,
         message: 'Authorization service error',
@@ -271,7 +272,7 @@ const checkOwnership = (resourceModel, resourceIdParam = 'id', ownerField = 'own
       next();
 
     } catch (error) {
-      console.error('Ownership check error:', error);
+      logger.error('Ownership check error', { error: error.message });
       return res.status(500).json({
         success: false,
         message: 'Ownership verification error',

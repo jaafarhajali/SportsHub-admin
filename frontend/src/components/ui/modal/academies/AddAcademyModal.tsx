@@ -9,6 +9,7 @@ import { toast } from "react-toastify";
 import { addAcademy } from "@/lib/api/dashboard/academy";
 import { Academy } from "@/types/Academy";
 import { useUser } from "@/context/UserContext";
+import AiDescriptionButton from "@/components/ai/AiDescriptionButton";
 
 interface AddAcademyModalProps {
     isOpen: boolean;
@@ -196,12 +197,27 @@ const AddAcademyModal: React.FC<AddAcademyModalProps> = ({ isOpen, onClose, setT
 
                     {/* Description */}
                     <div>
-                        <Label>Description</Label>
+                        <div className="flex items-center justify-between mb-1">
+                            <Label>Description</Label>
+                            <AiDescriptionButton
+                                type="academy"
+                                fields={{
+                                    name: formData.name,
+                                    location: formData.location,
+                                    email: formData.email,
+                                    phoneNumber: formData.phoneNumber,
+                                }}
+                                onGenerated={(desc) =>
+                                    setFormData((p) => ({ ...p, description: desc }))
+                                }
+                            />
+                        </div>
                         <textarea
                             name="description"
-                            placeholder="Enter description"
+                            placeholder="Enter description (or click Generate with AI)"
                             value={formData.description}
-                            className={`h-11 w-full rounded-lg border border-gray-300 outline-none appearance-none px-4 py-2.5 text-sm placeholder:text-gray-400 dark:bg-stone-950 dark:text-white/90 dark:placeholder:text-white/30 dark:border-gray-700 ${errors.description ? "border-l-3 border-l-red-500" : "border-l-3 border-l-green-700"}`}
+                            rows={4}
+                            className={`w-full rounded-lg border border-gray-300 outline-none appearance-none px-4 py-2.5 text-sm placeholder:text-gray-400 dark:bg-stone-950 dark:text-white/90 dark:placeholder:text-white/30 dark:border-gray-700 ${errors.description ? "border-l-3 border-l-red-500" : "border-l-3 border-l-green-700"}`}
                             onChange={handleChange}>
                         </textarea>
                     </div>

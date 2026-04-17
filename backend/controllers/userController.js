@@ -3,6 +3,7 @@ const asyncHandler = require("express-async-handler");
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 const sendVerificationEmail = require("../utils/sendVerification");
+const logger = require("../utils/logger");
 
 
 // your existing updateUserProfile...
@@ -95,7 +96,7 @@ exports.sendEmailVerification = asyncHandler(async (req, res) => {
   let verifyURL;
 
   if (platform === "mobile") {
-    console.log("Sending verification for mobile...");
+    logger.debug("Sending verification for mobile");
     verifyURL = `https://jaafarhajali.github.io/varification/?verifyToken=${token}`;
   } else {
     verifyURL = `http://localhost:3000/verify-email?token=${token}`;
@@ -150,7 +151,7 @@ exports.sendEmailVerification = asyncHandler(async (req, res) => {
 
     res.status(200).json({ message: "Verification email sent" });
   } catch (err) {
-    console.error("Verification email failed:", err);
+    logger.error("Verification email failed", { error: err.message });
     user.verificationToken = undefined;
     user.verificationTokenExpires = undefined;
     await user.save({ validateBeforeSave: false });
@@ -158,6 +159,34 @@ exports.sendEmailVerification = asyncHandler(async (req, res) => {
   }
 });
 
+
+exports.updateSkills = asyncHandler(async (req, res) => {
+  if (!req.user || !req.user.id) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+  const { position, skillLevel, preferredFoot, bio } = req.body;
+
+  const update = {};
+  if (position !== undefined) update["skills.position"] = position || null;
+  if (skillLevel !== undefined) update["skills.skillLevel"] = skillLevel || null;
+  if (preferredFoot !== undefined) update["skills.preferredFoot"] = preferredFoot || null;
+  if (bio !== undefined) update["skills.bio"] = String(bio).slice(0, 300);
+
+  const user = await User.findByIdAndUpdate(req.user.id, { $set: update }, { new: true })
+    .select("username skills");
+
+  if (!user) return res.status(404).json({ error: "User not found" });
+  res.json({ success: true, data: { username: user.username, skills: user.skills } });
+});
+
+exports.getMySkills = asyncHandler(async (req, res) => {
+  if (!req.user || !req.user.id) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+  const user = await User.findById(req.user.id).select("skills");
+  if (!user) return res.status(404).json({ error: "User not found" });
+  res.json({ success: true, data: user.skills || {} });
+});
 
 exports.verifyEmail = asyncHandler(async (req, res) => {
   const { token } = req.query;

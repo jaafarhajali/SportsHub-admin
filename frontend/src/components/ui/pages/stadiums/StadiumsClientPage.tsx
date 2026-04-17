@@ -15,8 +15,10 @@ import {
   Users,
   ChevronDown,
   X,
-  DollarSign
+  DollarSign,
+  Sparkles
 } from 'lucide-react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 type SortOption = 'name' | 'price-low' | 'price-high' | 'location';
@@ -229,6 +231,15 @@ const StadiumClientPage = () => {
                   )}
                 </div>
               </div>
+
+              {/* AI Search */}
+              <Link
+                href="/stadiums/ai-search"
+                className="inline-flex items-center gap-2 px-5 py-4 rounded-2xl bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
+              >
+                <Sparkles className="w-5 h-5" />
+                AI Search
+              </Link>
 
               {/* Sort Dropdown */}
               <div className="relative">

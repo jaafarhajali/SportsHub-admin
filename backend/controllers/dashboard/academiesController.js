@@ -1,15 +1,30 @@
 const Academy = require("../../models/academyModel");
+const logger = require("../../utils/logger");
 const Notification = require("../../models/notificationModel");
 const User = require("../../models/userModel");
 const mongoose = require("mongoose");
+const { getPagination, buildPagination } = require("../../utils/paginate");
 
-// GET all academies
+// GET all academies (paginated)
 const getAllAcademies = async (req, res) => {
   try {
-    const academies = await Academy.find().populate("ownerId", "username email");
-    res.json({ success: true, data: academies });
+    const { page, limit, skip } = getPagination(req, { defaultLimit: 20, maxLimit: 100 });
+    const [academies, total] = await Promise.all([
+      Academy.find()
+        .populate("ownerId", "username email")
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit),
+      Academy.countDocuments(),
+    ]);
+    res.json({
+      success: true,
+      count: academies.length,
+      data: academies,
+      pagination: buildPagination(page, limit, total),
+    });
   } catch (error) {
-    console.error("Error fetching academies:", error);
+    logger.error("Error fetching academies:", { error: error.message });
     res.status(500).json({ success: false, message: "Server error" });
   }
 };
@@ -23,7 +38,7 @@ const getAcademyById = async (req, res) => {
     }
     res.json({ success: true, data: academy });
   } catch (error) {
-    console.error("Error fetching academy:", error);
+    logger.error("Error fetching academy:", { error: error.message });
     res.status(500).json({ success: false, message: "Server error" });
   }
 };
@@ -100,7 +115,7 @@ const addAcademy = async (req, res) => {
 
     res.status(201).json({ success: true, data: savedAcademy });
   } catch (error) {
-    console.error("Error adding academy:", error);
+    logger.error("Error adding academy:", { error: error.message });
 
     if (error.name === "ValidationError") {
       const messages = Object.values(error.errors).map((val) => val.message);
@@ -139,7 +154,7 @@ const updateAcademy = async (req, res) => {
 
     return res.status(200).json({ success: true, data: updatedAcademy });
   } catch (error) {
-    console.error("Error updating academy:", error);
+    logger.error("Error updating academy:", { error: error.message });
     return res.status(500).json({ success: false, message: "Server error", error: error.message });
   }
 };
@@ -177,7 +192,7 @@ const deleteAcademy = async (req, res) => {
 
     res.json({ success: true, message: "Academy deleted successfully" });
   } catch (error) {
-    console.error("Error deleting academy:", error);
+    logger.error("Error deleting academy:", { error: error.message });
     res.status(500).json({ success: false, message: "Server error" });
   }
 };

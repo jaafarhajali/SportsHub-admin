@@ -3,18 +3,23 @@ const Stadium = require("../../models/stadiumModel");
 const User = require("../../models/userModel");
 
 const mongoose = require("mongoose");
+const { getPagination, buildPagination } = require("../../utils/paginate");
 
-// 🟡 GET all bookings
+// 🟡 GET all bookings (paginated)
 exports.getAllBookings = async (req, res) => {
   try {
-    // Fetch all bookings with populated user and stadium
-    const bookings = await Booking.find()
-      .populate("userId", "username email")
-      .populate("stadiumId", "name location penaltyPolicy") // include penaltyPolicy
-      .sort({ matchDate: -1 })
-      .lean(); // use lean so we can add fields
+    const { page, limit, skip } = getPagination(req, { defaultLimit: 25, maxLimit: 100 });
+    const [bookings, total] = await Promise.all([
+      Booking.find()
+        .populate("userId", "username email")
+        .populate("stadiumId", "name location penaltyPolicy")
+        .sort({ matchDate: -1 })
+        .skip(skip)
+        .limit(limit)
+        .lean(),
+      Booking.countDocuments(),
+    ]);
 
-    // Add penaltyAmount to bookings that have penaltyApplied = true
     const enhancedBookings = bookings.map((booking) => {
       if (booking.penaltyApplied && booking.stadiumId?.penaltyPolicy) {
         return {
@@ -29,6 +34,7 @@ exports.getAllBookings = async (req, res) => {
       success: true,
       count: enhancedBookings.length,
       data: enhancedBookings,
+      pagination: buildPagination(page, limit, total),
     });
   } catch (error) {
     res.status(500).json({

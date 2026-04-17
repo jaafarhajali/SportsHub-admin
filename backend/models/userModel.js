@@ -113,6 +113,30 @@ const userSchema = new mongoose.Schema({
     ref: "Team",
   },
 
+  skills: {
+    position: {
+      type: String,
+      enum: ["goalkeeper", "defender", "midfielder", "forward", null],
+      default: null,
+    },
+    skillLevel: {
+      type: Number,
+      min: 1,
+      max: 10,
+      default: null,
+    },
+    preferredFoot: {
+      type: String,
+      enum: ["left", "right", "both", null],
+      default: null,
+    },
+    bio: {
+      type: String,
+      maxLength: 300,
+      default: "",
+    },
+  },
+
   wallet: {
     type: Number,
     default: 100000000,
@@ -179,8 +203,6 @@ userSchema.methods.createPasswordResetToken = function () {
 
   this.passwordResetToken = crypto.createHash("sha256").update(resetToken).digest("hex");
 
-  console.log({ resetToken }, this.passwordResetToken);
-
   this.passwordResetExpiresAt = Date.now() + 10 * 60 * 1000; // 10 minutes
 
   return resetToken;
@@ -209,6 +231,9 @@ userSchema.methods.getSignedJwtToken = function () {
     { expiresIn: process.env.JWT_EXPIRES_IN } // this reads "7d"
   );
 };
+
+userSchema.index({ "role.name": 1 });
+userSchema.index({ team: 1 });
 
 const User = mongoose.model("User", userSchema);
 

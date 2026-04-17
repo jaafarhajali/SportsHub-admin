@@ -1,9 +1,10 @@
 'use client';
-import { MapPin, Users, Banknote, Trophy, Calendar, Zap, Crown } from "lucide-react";
+import { MapPin, Users, Banknote, Trophy, Calendar, Zap, Crown, Sparkles } from "lucide-react";
 import { formatCurrency, formatDate, getTournamentStatus } from '@/lib/utils/utils'; // adjust path based on your structure
 import { useState } from "react";
 import { leaveTournament } from "@/lib/api/tournaments";
 import { toast } from "react-toastify";
+import Link from "next/link";
 
 interface Tournament {
   _id: string;
@@ -231,6 +232,15 @@ const TournamentCard = ({ tournament, onJoin, userTeamId, isTeamLeader, onLeave 
             )}
           </div>
 
+          <div className="flex flex-col items-end gap-2">
+          <Link
+            href={`/tournaments/${tournament._id}/bracket`}
+            className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white transition"
+          >
+            <Sparkles className="w-3.5 h-3.5" />
+            View bracket
+          </Link>
+
           {!hasJoined ? (
             <button
               onClick={handleOpenPaymentModal}
@@ -268,6 +278,7 @@ const TournamentCard = ({ tournament, onJoin, userTeamId, isTeamLeader, onLeave 
               }
             </div>
           )}
+          </div>
         </div>
       </div>
 

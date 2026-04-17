@@ -1,12 +1,13 @@
 const Academy = require("../models/academyModel"); // Adjust path as needed
 const mongoose = require("mongoose");
+const logger = require("../utils/logger");
 
 const getAllAcademies = async (req, res) => {
   try {
     const academies = await Academy.find().populate("ownerId", "username email");
     res.json({ success: true, data: academies });
   } catch (error) {
-    console.error("Error fetching academies:", error);
+    logger.error("Error fetching academies", { error: error.message });
     res.status(500).json({ success: false, message: "Server error" });
   }
 };
@@ -20,7 +21,7 @@ const getAcademyById = async (req, res) => {
     }
     res.json({ success: true, data: academy });
   } catch (error) {
-    console.error("Error fetching academy:", error);
+    logger.error("Error fetching academy", { error: error.message });
     res.status(500).json({ success: false, message: "Server error" });
   }
 };

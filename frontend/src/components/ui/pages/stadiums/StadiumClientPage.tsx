@@ -7,6 +7,8 @@ import { bookStadium, getStadiumById } from '@/lib/api/stadium';
 import { Stadium } from '@/types/Stadium';
 import { toast } from 'react-toastify';
 import { getImageUrl } from '@/lib/utils/imageUrl';
+import ReviewSummary from '@/components/ai/ReviewSummary';
+import StadiumReviews from '@/components/reviews/StadiumReviews';
 
 interface CalendarData {
     date: string;
@@ -402,6 +404,11 @@ export default function StadiumClientPage() {
                                     <p className="text-sm text-orange-700 dark:text-orange-300 font-medium leading-relaxed">
                                         Cancel at least <span className="font-bold">{stadium.penaltyPolicy.hoursBefore} hours</span> before your booking to avoid a <span className="font-bold">{formatPrice(Number(stadium.penaltyPolicy.penaltyAmount))} LBP</span> penalty fee.
                                     </p>
+                                </div>
+
+                                <div className="mt-4">
+                                    <ReviewSummary stadiumId={stadium._id} />
+                                    <StadiumReviews stadiumId={stadium._id} />
                                 </div>
                             </div>
                         </div>

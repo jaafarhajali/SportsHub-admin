@@ -3,14 +3,25 @@ const Team = require("../../models/teamModel");
 const User = require("../../models/userModel");
 const Notification = require("../../models/notificationModel");
 const Role = require("../../models/roleModel");
+const { getPagination, buildPagination } = require("../../utils/paginate");
 
 exports.getAllTeams = asyncHandler(async (req, res) => {
-  const teams = await Team.find().populate("leader", "username").populate("members", "username");
+  const { page, limit, skip } = getPagination(req, { defaultLimit: 25, maxLimit: 100 });
+  const [teams, total] = await Promise.all([
+    Team.find()
+      .populate("leader", "username")
+      .populate("members", "username")
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit),
+    Team.countDocuments(),
+  ]);
 
   res.status(200).json({
     success: true,
     count: teams.length,
     data: teams,
+    pagination: buildPagination(page, limit, total),
   });
 });
 

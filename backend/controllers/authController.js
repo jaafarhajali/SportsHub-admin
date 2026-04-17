@@ -4,6 +4,7 @@ const asyncHandler = require("express-async-handler");
 const validator = require("validator");
 const crypto = require("crypto");
 const sendEmail = require("../utils/sendEmail");
+const logger = require("../utils/logger");
 
 // @desc      Register user
 // @route     POST /api/auth/register
@@ -69,7 +70,7 @@ exports.register = asyncHandler(async (req, res) => {
     }
 
     // Fallback for unexpected errors
-    console.error(err);
+    logger.error("Auth register failed", { error: err.message });
     res.status(500).json({
       success: false,
       message: "An unexpected error occurred. Please try again.",
@@ -170,14 +171,14 @@ exports.forgotPassword = asyncHandler(async (req, res) => {
   }
 
   const platform = req.query.platform;
-  console.log("Platform:", platform);
+  logger.debug("Password reset requested", { platform });
   const resetToken = user.createPasswordResetToken();
   await user.save({ validateBeforeSave: false });
 
   let resetURL;
 
   if (platform === "mobile") {
-    console.log("Mobile platform detected");
+    
     resetURL = `https://jaafarhajali.github.io/redirect?token=${resetToken}`;
   } else {
     resetURL = `http://localhost:3000/auth/reset-password/${resetToken}`;
@@ -253,7 +254,7 @@ exports.forgotPassword = asyncHandler(async (req, res) => {
     user.passwordResetExpiresAt = undefined;
     await user.save({ validateBeforeSave: false });
 
-    console.error("Email failed:", err);
+    logger.error("Email send failed", { error: err.message });
     return res.status(500).json({ success: false, message: "Failed to send reset email" });
   }
 });

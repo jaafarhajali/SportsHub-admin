@@ -55,6 +55,10 @@ const bookingSchema = new mongoose.Schema({
   },
 });
 
+bookingSchema.index({ userId: 1, status: 1, matchDate: -1 });
+bookingSchema.index({ stadiumId: 1, matchDate: -1 });
+bookingSchema.index({ matchDate: 1, status: 1 });
+
 const Booking = mongoose.model("Booking", bookingSchema);
 
 module.exports = Booking;

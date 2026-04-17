@@ -1,4 +1,5 @@
 import ProfileContent from "@/components/ui/pages/profile/ProfileContent";
+import SkillsEditor from "@/components/skills/SkillsEditor";
 import { Metadata } from "next";
 
 
@@ -11,6 +12,7 @@ export default function ProfilePage() {
   return (
     <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-8 space-y-8">
       <ProfileContent />
+      <SkillsEditor />
     </div>
   );
 }

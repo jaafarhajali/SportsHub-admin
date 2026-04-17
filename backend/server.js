@@ -1,11 +1,28 @@
+const dotenv = require("dotenv");
+dotenv.config();
+
+// Sentry must be required and initialized BEFORE anything else so it can
+// auto-instrument http / express / mongoose. If SENTRY_DSN is not set we
+// still require the module but skip .init() — the app works normally without it.
+const Sentry = require("@sentry/node");
+if (process.env.SENTRY_DSN) {
+  Sentry.init({
+    dsn: process.env.SENTRY_DSN,
+    environment: process.env.NODE_ENV || "development",
+    tracesSampleRate: Number(process.env.SENTRY_TRACES_SAMPLE_RATE || 0.1),
+  });
+  console.log("Sentry initialized");
+}
+
 const app = require("./app");
 const http = require("http");
 const dns = require("dns");
 const mongoose = require("mongoose");
-const dotenv = require("dotenv");
 
-// Load environment variables
-dotenv.config();
+// Sentry's Express error handler must be registered AFTER all routes.
+if (process.env.SENTRY_DSN) {
+  Sentry.setupExpressErrorHandler(app);
+}
 
 // Force public DNS resolvers so MongoDB SRV lookups work behind restrictive local DNS
 dns.setServers(["8.8.8.8", "1.1.1.1"]);
